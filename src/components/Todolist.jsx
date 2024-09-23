@@ -1,16 +1,16 @@
 import { useState } from "react";
 
 const SAMPLE_TODOS = [
-    { id: 1, text: "Buy milk" },
-    { id: 2, text: "Clean the house" },
-    { id: 3, text: "Go for a run" },
-    { id: 4, text: "Finish homework" },
-    { id: 5, text: "Call mom" },
-    { id: 6, text: "Buy groceries" },
-    { id: 7, text: "Walk the dog" },
-    { id: 8, text: "Read a book" },
-    { id: 9, text: "Do laundry" },
-    { id: 10, text: "Write code" },
+    { id: 1, text: "Buy milk", completed: false },
+    { id: 2, text: "Clean the house", completed: false  },
+    { id: 3, text: "Go for a run", completed: false  },
+    { id: 4, text: "Finish homework", completed: false  },
+    { id: 5, text: "Call mom", completed: false  },
+    { id: 6, text: "Buy groceries", completed: false  },
+    { id: 7, text: "Walk the dog", completed: false  },
+    { id: 8, text: "Read a book", completed: false  },
+    { id: 9, text: "Do laundry", completed: false  },
+    { id: 10, text: "Write code", completed: false  },
   ];
 
 const TodoList = () => {
@@ -37,12 +37,20 @@ const TodoList = () => {
         //     return;
         // }
 
+        const newTodoObj = {
+            id: crypto.randomUUID(),
+            text: newTodo,
+            completed: false,
+        }
+
         // setTodos의 값 
         // (todos에 값이 추가됐을 경우)
-        setTodos([{id:crypto.randomUUID(), text: newTodo},...todos,])
+        // setTodos([{id:crypto.randomUUID(), text: newTodo, completed: false},...todos,])
         // 중복되지 않는 아이디 +
         // 새로 추가된 값 + 
         // (기존의) SAMPLE_TODOS
+        // upadate 됐으니까
+        setTodos([newTodoObj, ...todos]);
 
         // 폼 초기화 (tbx에 입력된 값 삭제)
         event.target.reset();
@@ -52,15 +60,50 @@ const TodoList = () => {
     // tbx의 변경을 감지해 상태에 입력값을 저장하는 함수
     const handleInputChange = (event) => setNewTodo(event.target.value)
 
+    // 완료 버튼 클릭 시 
+    const toggleCompleted = (id) => { // todo의 id
+        // 새로운 배열을 만들 빈 배열을 선언
+        const updateTodos = [];
+        // todo 배열의 각 항목을 순회
+        todos.forEach((todo) => {
+            // 순회하고 있는 객체의 id가 사용자가 변경하고 싶어하는 id가 같다면
+            if (todo.id === id) {
+                // SAMPLE_TODOS 수정
+                const newTodo = {
+                    // 기존 todo의 id 유지
+                    id: todo.id, 
+                    // 기존 todo의 text 유지
+                    text: todo.text, 
+                    // toggle임
+                    // 완료 상태면 미완료 상태로
+                    // 미완료 상태면 완료 상태로 변경해 줘야함
+                    // 기존 값의 반대로
+                    completed: !todo.completed,
+                }
+                // 수정된 항목을 새로운 배열에 추가
+                return updateTodos.push(newTodo);
+            } else {
+                return updateTodos.push(todo);
+            }
+           
+            // 새로운 배열로 update
+            // 빈 배열에 todo 값 추가
+        });
+        // setTodos에 updateTodos를 덮어씌움
+        setTodos(updateTodos);
+
+    }
+
     return (
         <div>
-            {/* 폼 제출 시, 페이지 새로고침 방지 함수 */}
+            {/* 폼 제출 시, 페이지 새로고침 방지 함수 호출*/}
             <form onSubmit={handleSubmit}>
                 <input 
                 type="text" 
                 name="todo"
                 value={newTodo}
-                // tbx의 변경을 감지해 상태에 입력값을 저장하는 함수
+                placeholder="입력 ㄱ"
+                // tbx의 변경을 감지해 상태에 입력값을 저장하는 함수 호출
                 onChange={handleInputChange}/>
                 <button type="submit">Add Todo</button>
                 </form>
@@ -68,7 +111,13 @@ const TodoList = () => {
           {/* map을 사용해서 리스트 출력 */}
             {
                 todos.map((todo) => (
-                    <li key={todo.id}>{todo.text}</li>
+                    <li key={todo.id}>
+                        
+                        {/* 
+                        true나 false를 문자열화 함 → String(todo.completed)
+                        */}
+                    <p>{todo.text} - {String(todo.completed)}</p>
+                    <button onClick={() => toggleCompleted(todo.id)}>완료</button></li>
                  ))
             }
         </ul>
@@ -78,16 +127,3 @@ const TodoList = () => {
 }
 
 export default TodoList;
-
-
-
-// target: 이벤트가 일어난 대상
-// value: 입력한 데이터
-// e.target: 이벤트 객체의 target만 가져와서 출력
-// e.target.value: input의 value를 가져오므로 입력한 값을 출력
-
-// preventDefault(): 이벤트 발생 시,
-// 페이지가 새로 고침되지 않고
-// 자바스크립트 코드로 처리되도록 함
-
-// reset 메서드: 모든 input들을 한 번에 초기화 해줌
